@@ -2,7 +2,7 @@
 header('content-type:application/json;charset=utf8');
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/include.php');
 if (cmethod::isPost() == false) {
-    exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','不支持该请求方法');
+    exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','The request method is not supported');
     exit;
 }
 $check_post_data = array(
@@ -10,12 +10,12 @@ $check_post_data = array(
 );
 $data = json_decode(file_get_contents('php://input'),true,10);
 if ($data == null) {
-    exceptions::doErr(400,'IllegalArgumentException','提交的数据不是JSON数据');
+    exceptions::doErr(400,'IllegalArgumentException','Input is not JSON');
     exit;
 }
 foreach ($check_post_data as $v) {
     if (!isset($data[$v])) {
-        exceptions::doErr(400,'IllegalArgumentException','缺少参数');
+        exceptions::doErr(400,'IllegalArgumentException','Missing parameters');
         exit;
     }
 }
@@ -33,13 +33,13 @@ if (!isset($data['requestUser'])) {
     $req_user = $data['requestUser'];
 }
 if (!$db->isAcctokenAvailable($acctoken)) {
-    exceptions::doErr(403,'ForbiddenOperationException','该Token不存在');
+    exceptions::doErr(403,'ForbiddenOperationException','The Token does not exist');
 }
 if (!(isset($clitoken) == $db->chkAcctoken($acctoken,$clitoken))) {
-    exceptions::doErr(403,'ForbiddenOperationException','指定的ClientToken无效');
+    exceptions::doErr(403,'ForbiddenOperationException','The specified ClientToken is invalid');
 }
 if ($db->getTokenState($acctoken) < 0) {
-    exceptions::doErr(403,'ForbiddenOperationException','该Token已失效');
+    exceptions::doErr(403,'ForbiddenOperationException','The Token has expired');
 }
 $db->setTokenState($acctoken);
 $db->creToken($cli_token,$available_userid);
@@ -56,6 +56,7 @@ $authdata["availableProfiles"] = array(
 );
 $authdata["selectedProfile"] = $profile->getArrayFormated();
 if ($req_user) {
-    $authdata["user"] = (new User($json["username"],"",$userid,"zh_CN"))->getArrayFormated();
+    //$authdata["user"] = (new User($json["username"],"",$userid,"zh_CN"))->getArrayFormated();
+    $authdata["user"] = (new User($json["username"],"",$userid,"en_US"))->getArrayFormated();
 }
 echo json_encode($authdata);

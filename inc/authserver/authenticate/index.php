@@ -2,7 +2,7 @@
 header('content-type:application/json;charset=utf8');
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/include.php');
 if (cmethod::isPost() == false) {
-    exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','不支持该请求方法');
+    exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','The request method is not supported');
     exit;
 }
 $check_post_data = array(
@@ -10,28 +10,28 @@ $check_post_data = array(
 );
 $data = json_decode(file_get_contents('php://input'),true,10);
 if ($data == null) {
-    exceptions::doErr(400,'IllegalArgumentException','提交的数据不是JSON数据');
+    exceptions::doErr(400,'IllegalArgumentException','Submitted data is not JSON data');
     exit;
 }
 foreach ($check_post_data as $v) {
     if (!isset($data[$v])) {
-        exceptions::doErr(400,'IllegalArgumentException','缺少参数');
+        exceptions::doErr(400,'IllegalArgumentException','Missing parameters');
         exit;
     }
 }
 $email = $data['username'];
 $passwd = $data['password'];
 if ($email == '' or $passwd == '') {
-    exceptions::doErr(403,'ForbiddenOperationException','邮箱或密码不能为空');
+    exceptions::doErr(403,'ForbiddenOperationException','Email or password cannot be empty');
     exit;
 }
 //header("Content-Type: application/json; charset=utf-8");
 if (!$db->isAvailable($email)) {
-    exceptions::doErr(404,'ForbiddenOperationException','您输入的账号不存在');
+    exceptions::doErr(404,'ForbiddenOperationException','The account you entered does not exist');
     exit;
 }
 if (!$db->chkPasswd($email,$passwd)) {
-    exceptions::doErr(403,'ForbiddenOperationException','您输入的邮箱或密码错误');
+    exceptions::doErr(403,'ForbiddenOperationException','The email or password you entered is incorrect');
     exit;
 }
 $userid = UUID::getUserUuid(md5($email));
@@ -62,6 +62,7 @@ if ($profile !== null) {
     $authdata["selectedProfile"] = $profile->getArrayFormated();
 }
 if ($req_user) {
-    $authdata["user"] = (new User($json["username"],"",$userid,"zh_CN"))->getArrayFormated();
+    //$authdata["user"] = (new User($json["username"],"",$userid,"zh_CN"))->getArrayFormated();
+    $authdata["user"] = (new User($json["username"],"",$userid,"en_US"))->getArrayFormated();
 }
 echo json_encode($authdata);

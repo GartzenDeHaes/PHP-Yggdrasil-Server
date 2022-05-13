@@ -19,12 +19,12 @@ class User{
 	public function getArrayFormated(){
         $dataarr = array(
 			"id" => $this->UUID,
-			"properties"=>array( // 用户的属性（数组，每一元素为一个属性）
+			"properties"=>array( // User attributes (array, one attribute per element)
 				array(
 					"name"=>"preferredLanguage",
 					"value"=>$this->language,
 				),
-				// ,...（可以有更多）
+				// ,...(there can be more)
 			)
 			);
 		return $dataarr;

@@ -12,23 +12,10 @@ SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- 数据库： `minecraft`
---
 CREATE DATABASE IF NOT EXISTS `minecraft` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `minecraft`;
 
 -- --------------------------------------------------------
-
---
--- 表的结构 `chkname`
---
 
 DROP TABLE IF EXISTS `chkname`;
 CREATE TABLE `chkname` (
@@ -37,10 +24,6 @@ CREATE TABLE `chkname` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
-
---
--- 表的结构 `users`
---
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
@@ -66,10 +49,6 @@ CREATE TABLE `users` (
 
 -- --------------------------------------------------------
 
---
--- 表的结构 `sessions`
---
-
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
   `server_id` varchar(255) NOT NULL,
@@ -79,10 +58,6 @@ CREATE TABLE `sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
-
---
--- 表的结构 `texturedata`
---
 
 DROP TABLE IF EXISTS `texturedata`;
 CREATE TABLE `texturedata` (
@@ -97,10 +72,6 @@ CREATE TABLE `texturedata` (
 
 -- --------------------------------------------------------
 
---
--- 表的结构 `tokens`
---
-
 DROP TABLE IF EXISTS `tokens`;
 CREATE TABLE `tokens` (
   `acc_token` varchar(50) NOT NULL,
@@ -113,10 +84,6 @@ CREATE TABLE `tokens` (
 
 -- --------------------------------------------------------
 
---
--- 表的结构 `vailtoken`
---
-
 DROP TABLE IF EXISTS `vailtoken`;
 CREATE TABLE `vailtoken` (
   `id` int(10) NOT NULL,
@@ -125,72 +92,41 @@ CREATE TABLE `vailtoken` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- 转储表的索引
+-- Dump table index
 --
 
---
--- 表的索引 `chkname`
---
 ALTER TABLE `chkname`
   ADD UNIQUE KEY `uuid` (`uuid`),
   ADD UNIQUE KEY `playername` (`playername`);
 
---
--- 表的索引 `users`
---
 ALTER TABLE `users`
   ADD PRIMARY KEY (`uid`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `userid` (`userid`),
   ADD KEY `email` (`email`);
 
---
--- 表的索引 `sessions`
---
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`server_id`) USING BTREE;
 
---
--- 表的索引 `texturedata`
---
 ALTER TABLE `texturedata`
   ADD PRIMARY KEY (`tid`);
 
---
--- 表的索引 `tokens`
---
 ALTER TABLE `tokens`
   ADD PRIMARY KEY (`acc_token`) USING BTREE;
 
---
--- 表的索引 `vailtoken`
---
 ALTER TABLE `vailtoken`
   ADD PRIMARY KEY (`id`);
 
 --
--- 在导出的表使用AUTO_INCREMENT
+-- AUTO_INCREMENT
 --
 
---
--- 使用表AUTO_INCREMENT `users`
---
 ALTER TABLE `users`
   MODIFY `uid` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 
---
--- 使用表AUTO_INCREMENT `texturedata`
---
 ALTER TABLE `texturedata`
   MODIFY `tid` int(10) NOT NULL AUTO_INCREMENT;
 
---
--- 使用表AUTO_INCREMENT `vailtoken`
---
 ALTER TABLE `vailtoken`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

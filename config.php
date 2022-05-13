@@ -1,22 +1,23 @@
 <?php
-//外置登录服务器基本配置//
-$servername = "九境尘域"; //外置登录服务器名
-$impname = "9cymc-minecraft-auth";
-$impver = "1.0"; //版本号
+//Basic configuration of external login server//
+$servername = "Portland Softworks LLC"; //External login server name
+$impname = "portland-minecraft-auth";
+$impver = "0.1"; //version number
 $skinurl = array(
-    ".zhjlfx.cn",//皮肤站链接，可填写多个
+    ".zhjlfx.cn",//Skin station link, you can fill in multiple
     ".minecraft.net"
 );
-$homepage = "https://www.9cymc.cn"; //网站首页
-$regurl = "https://reg.zhjlfx.cn"; //玩家注册地址
-//外置登录服务器密钥配置//
-$publickey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-public-key.pem"); //公钥文件
-$privatekey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-private-key.pem"); //私钥文件
-//外置登录服务器数据库配置//
-$host = 'host'; //数据库地址
-$port = 3306; //数据库端口
-$user = 'user'; //数据库用户名
-$pass = 'pass'; //数据库密码
-$dbname = 'database'; //数据库名
-//正版直接登录支持
+$homepage = "https://portlandsoft.works"; //website homepage
+$regurl = "https://portlandsoft.works/registration"; //Player registration address
+//External login server key configuration//
+$publickey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-public-key.pem"); //public key file
+$privatekey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-private-key.pem"); //private key
+
+//DATABASE//
+$host = 'host'; //database address
+$port = 3306; //database port
+$user = 'user'; //database username
+$pass = 'pass'; //database password
+$dbname = 'database'; //Database name
+//Genuine direct login support
 $mojanglogin = true;

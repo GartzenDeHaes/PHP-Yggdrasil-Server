@@ -1,6 +1,6 @@
 <?php
 class Exceptions{
-    //生成 sha1WithRSA 签名
+    //generate sha1WithRSA sign
     static function doErr($code,$error,$error_message,$cause=null){
         header("Content-Type: application/json; charset=utf-8");
         header(self::$codes[$code]);
@@ -13,9 +13,9 @@ class Exceptions{
         }
         echo json_encode($arr);
         /*{
-            "error":"错误的简要描述（机器可读）",
-            "errorMessage":"错误的详细信息（人类可读）",
-            "cause":"该错误的原因（可选）"
+            "error":"Brief description of the error（machine readable）",
+            "errorMessage":"Error details（human readable）",
+            "cause":"Reason for the error (optional)"
         }
         */
         exit;

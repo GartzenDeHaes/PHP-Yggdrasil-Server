@@ -5,7 +5,7 @@ class database {
         global $host,$port,$user,$pass,$dbname;
         $iscon = mysqli_connect($host.":".$port,$user,$pass,$dbname);
         if (!$iscon) {
-            echo "无法连接至MySQL数据库：".mysqli_connect_error();
+            echo "Unable to connect to MySQL database: ".mysqli_connect_error();
             header(Exceptions::$codes[500]);
             die();
         }
@@ -14,7 +14,7 @@ class database {
     function query($sql) {
         $stmt = $this->mysqli->prepare($sql);
         if ($stmt == false) {
-            echo "MySQL查询出错：".$this->mysqli->error;
+            echo "Error in MySQL query: ".$this->mysqli->error;
             header(Exceptions::$codes[500]);
             return -1;
         }
@@ -30,7 +30,7 @@ class database {
     function query_change($sql) {
         $stmt = $this->mysqli->prepare($sql);
         if ($stmt == false) {
-            echo "MySQL查询出错：".$this->mysqli->error;
+            echo "Error in MySQL query: ".$this->mysqli->error;
             header(Exceptions::$codes[500]);
             return -1;
         }
@@ -53,7 +53,7 @@ class database {
         $salt = $ret[0][10];
         $playername = $ret[0][1];
         $playeruuid = UUID::getUserUuid($playername);
-        $skinuuid = file_get_contents("https://api.zhjlfx.cn/?type=getuuid&method=email&email=".$email);
+        $skinuuid = "skinuuid";// file_get_contents("https://api.zhjlfx.cn/?type=getuuid&method=email&email=".$email);
         $encrypted = md5(md5($passwd).$salt);
         $rs = ($encrypted == $ucpass);
         if ($rs) {
@@ -86,11 +86,10 @@ class database {
         } else {
             $this->query_change("update tokens set acc_token = '".$acctoken."', cli_token = '".$cli_token."', state = 1 where owner_uuid = '".$userid."'");
         }
-
     }
     function getTokensByOwner($userid) {
         $ret = $this->query("select * from tokens where owner_uuid = '".$userid."'");
-        if (!ret) {
+        if (!$ret) {
             return false;
         } else {
             return array($ret[0][0],$ret[0][1]);
@@ -211,7 +210,7 @@ class database {
         $this->query_change("delete from sessions where date(o_time) <= date_sub(now(),interval 30 second);");
     }
     function updateSkinData($uuid) {
-        $texturedata = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
+        $texturedata = "texturedata";// = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
         $this->query_change("update users set texturedata = '".$texturedata."' where uuid = '".$uuid."'");
     }
     function addPlayerInfo($playername,$playeruuid) {
