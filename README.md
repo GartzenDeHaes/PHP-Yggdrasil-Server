@@ -1,6 +1,8 @@
 # PHP-Yggdrasil-Server
 A PHP SQLITE Based  Minecraft Yggdrasil Authentication Server for My Minecraft Server
 
+Ported from [here](https://github.com/Erythrocyte3803/PHP-Yggdrasil-Server).
+
 - Database is stored in data/db.sqlite.
 - Generate the encription PEM files by installing OpenSSL and running the commands in keys/genkeys.bat.
 - Unless you do some URL rewriting in the webserver, the endpoints are authserver/authentication, /sessionserver/session, etc.
