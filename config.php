@@ -10,14 +10,12 @@ $skinurl = array(
 $homepage = "https://portlandsoft.works"; //website homepage
 $regurl = "https://portlandsoft.works/registration"; //Player registration address
 //External login server key configuration//
-$publickey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-public-key.pem"); //public key file
-$privatekey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-private-key.pem"); //private key
 
-//DATABASE//
-$host = 'host'; //database address
-$port = 3306; //database port
-$user = 'user'; //database username
-$pass = 'pass'; //database password
-$dbname = 'database'; //Database name
+$pubKeyFileName = $_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-public-key.pem";
+$privKeyFileName = $_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-private-key.pem";
+
+$publickey = file_get_contents($pubKeyFileName); //public key file
+$privatekey = file_get_contents($privKeyFileName); //private key
+
 //Genuine direct login support
 $mojanglogin = true;
