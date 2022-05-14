@@ -1,5 +1,5 @@
 # PHP-Yggdrasil-Server
-A PHP SQLITE Based  Minecraft Yggdrasil Authentication Server for My Minecraft Server
+A PHP SQLITE Based  Minecraft Yggdrasil Authentication Server for Minecraft Like Client
 
 Ported from [here](https://github.com/Erythrocyte3803/PHP-Yggdrasil-Server).
 
