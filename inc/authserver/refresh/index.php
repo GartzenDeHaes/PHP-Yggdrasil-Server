@@ -46,7 +46,7 @@ $db->creToken($cli_token,$available_userid);
 //$tokens = $db->getTokensByOwner($cli_token,$available_userid);
 $tokens = $db->getTokensByOwner($available_userid);
 $profile = $db->getProfileByOwner($available_userid);
-$db->porfileToken($tokens[0],$profile->UUID);
+$db->profileToken($tokens[0],$profile->UUID);
 $authdata = array(
     "accessToken" => $tokens[0],
     "clientToken" => $tokens[1]
@@ -57,6 +57,8 @@ $authdata["availableProfiles"] = array(
 $authdata["selectedProfile"] = $profile->getArrayFormated();
 if ($req_user) {
     //$authdata["user"] = (new User($json["username"],"",$userid,"zh_CN"))->getArrayFormated();
-    $authdata["user"] = (new User($json["username"],"",$userid,"en_US"))->getArrayFormated();
+    $authdata["user"] = (new User($data["username"],"",$userid,"en_US"))->getArrayFormated();
 }
+
+$authdata["status"] = "OK";
 echo json_encode($authdata);

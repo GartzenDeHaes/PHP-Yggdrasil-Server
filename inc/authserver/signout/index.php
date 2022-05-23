@@ -36,4 +36,7 @@ if (!$db->chkPasswd($email,$passwd)) {
 }
 $available_userid = $db->getUserid($email);
 $db->killTokensByOwner($available_userid);
+
 header(Exceptions::$codes[204]);
+$respdata = array("status" => "OK");
+echo json_encode($respdata);

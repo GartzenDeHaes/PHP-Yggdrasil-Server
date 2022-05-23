@@ -6,4 +6,7 @@ function _autoload($classname) {
     //load all classes
     require_once $_SERVER['DOCUMENT_ROOT'] . "/inc/classes/" . strtolower($classname) . ".php";
 }
+
 $db = new database();
+
+$db->creIpRec($client_ip_int);

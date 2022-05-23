@@ -11,7 +11,7 @@ function createJavaUuid($striped) {
 	return implode('-', $components);
 }
 class UUID{
-    static function getProfileUuid($name) {//有"-"隔开
+    static function getProfileUuid($name) {//separated by "-"
     $data = hex2bin(md5("OfflinePlayer:" . $name));
     //set the version to 3 -> Name based md5 hash
     $data[6] = chr(ord($data[6]) & 0x0f | 0x30);
@@ -20,7 +20,7 @@ class UUID{
     return createJavaUuid(bin2hex($data));
     }
 
-    static function getUserUuid($name) {//无符号
+    static function getUserUuid($name) {//unsigned
         $data = hex2bin(md5("OfflinePlayer:" . $name));
         //set the version to 3 -> Name based md5 hash
         $data[6] = chr(ord($data[6]) & 0x0f | 0x30);

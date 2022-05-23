@@ -22,3 +22,5 @@ foreach ($check_post_data as $v) {
 $acctoken = $data['accessToken'];
 $db->setTokenState($acctoken);
 header(Exceptions::$codes[204]);
+$respdata = array("status" => "OK");
+echo json_encode($respdata);

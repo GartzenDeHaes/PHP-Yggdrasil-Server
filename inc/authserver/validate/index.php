@@ -41,3 +41,6 @@ if($db->isPlayerNameChanged($uuid)){
     $db->setTokenState($acctoken);
 }
 header(Exceptions::$codes[204]);
+
+$respdata = array("status" => "OK");
+echo json_encode($respdata);
