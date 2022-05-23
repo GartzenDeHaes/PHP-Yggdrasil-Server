@@ -8,7 +8,7 @@ function do404() {
 	// 404 strike
 	$db->updIp404($client_ip_int);
 
-	header('content-type:application/json;charset=utf8');
+	header('content-type:application/json;charset=utf-8');
 	echo json_encode(serverinfo::info($servername, $impname, $impver, $homepage, $regurl, $skinurl, $publickey));
 }
 

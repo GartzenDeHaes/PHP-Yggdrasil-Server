@@ -1,5 +1,5 @@
 <?php
-header('content-type:application/json;charset=utf8');
+header('content-type:application/json;charset=utf-8');
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/include.php');
 if (cmethod::isPost() == false) {
     exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','The request method is not supported');

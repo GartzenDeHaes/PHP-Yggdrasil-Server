@@ -1,5 +1,5 @@
 <?php
-header('content-type:text/html;charset=utf8');
+header('content-type:text/html;charset=utf-8');
 header("Pragma: no-cache");
 header('Expires: Sun, 01 Jan 2014 00:00:00 GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');

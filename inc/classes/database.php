@@ -184,7 +184,7 @@ class database
 		global $client_ip_int;
 
 		if ($this->getServer($server_id, $server_token)) {
-			$this->query_change("UPDATE servers SET ipaddr='".$host."', name='".$str_name."', port=".$int_port.", version=".$int_prot_ver.", ispublic='".$char_is_public."', max_users='".$int_max_users."', cur_users='".$cur_users."' updated_dts=CURRENT_TIMESTAMP WHERE server_id='".$server_id."';");
+			$this->query_change("UPDATE servers SET host='".$host."', name='".$str_name."', port=".$int_port.", version=".$int_prot_ver.", ispublic='".$char_is_public."', max_users='".$int_max_users."', cur_users='".$cur_users."', updated_dts=CURRENT_TIMESTAMP WHERE server_id='".$server_id."';");
 		} else {
 			$this->query_change("UPDATE ips SET heart_fail = heart_fail + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=".$client_ip_int.";");
 		}

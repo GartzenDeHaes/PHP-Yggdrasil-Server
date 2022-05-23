@@ -1,5 +1,5 @@
 <?php
-header('content-type:application/json;charset=utf8');
+header('content-type:application/json;charset=utf-8');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/inc/include.php');
 if (cmethod::isPost() == false) {
 	$db->updIp404($client_ip_int);
