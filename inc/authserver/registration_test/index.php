@@ -8,14 +8,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/inc/include.php');
 
 $error_msg = "&nbsp;";
 
-function strip_input($txt) {
-	return htmlspecialchars(stripslashes(trim($txt)));
-}
-
-function isvalid_input($txt) {
-	return $txt == strip_input($txt);
-}
-
 function validate_field($txt, $minlen, $maxlen, $fieldName) {
 	global $error_msg;
 
@@ -65,10 +57,10 @@ if (! cmethod::isPost()) {
 	$password = "password123";
 	$secphrase = "Might ask you this at some point";
 } else {
-	$username = htmlspecialchars(trim($_POST["username"]));
-	$email = htmlspecialchars(trim($_POST["email"]));
-	$password = htmlspecialchars(trim($_POST["password"]));
-	$secphrase = htmlspecialchars(trim($_POST["secphz"]));
+	$username = safe_input($_POST["username"]);
+	$email = safe_input($_POST["email"]);
+	$password = safe_input($_POST["password"]);
+	$secphrase = safe_input($_POST["secphz"]);
 
 	if 
 	(
@@ -118,7 +110,7 @@ input {background:linen;};
 	<tr><td colspan=2>&nbsp;</td></tr>
 	<tr><td colspan=2 style="color:green;" align=center>CONGRATULATIONS<br/><?php echo $username ?></td></tr>
 	<tr><td colspan=2>&nbsp;</td></tr>
-	<tr><td colspan=2>Registration complete.  You can now logon in the Totally Not MineCraft application with your EMAIL (<?php echo $email ?>).</td></tr>
+	<tr><td colspan=2>Registration complete.  You can now logon in the Totally Not MineCraft application.</td></tr>
 	<tr><td colspan=2>&nbsp;</td></tr>
 	<tr><td colspan=2 align=center><input type="button" onclick="window.location.href='https://portlandsoft.works'" value="Close" /></td></tr>		
 	<tr><td colspan=2>&nbsp;</td></tr>

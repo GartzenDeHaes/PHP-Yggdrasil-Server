@@ -1,8 +1,13 @@
 <?php
 class Exceptions
 {
-	//generate sha1WithRSA sign
-	static function doErr($code, $error, $error_message, $cause = null)
+/*{
+		"error":"Brief description of the error（machine readable）",
+		"errorMessage":"Error details（human readable）",
+		"cause":"Reason for the error (optional)"
+	}
+	*/
+	static function doErr($code, $error, $error_message, $cause = 999)
 	{
 		header("Content-Type: application/json; charset=utf-8");
 		header(self::$codes[$code]);
@@ -10,16 +15,8 @@ class Exceptions
 			"error" => $error,
 			"errorMessage" => $error_message
 		);
-		if ($cause != null) {
-			$arr["cause"] = $cause;
-		}
+		$arr["code"] = $cause;
 		echo json_encode($arr);
-		/*{
-            "error":"Brief description of the error（machine readable）",
-            "errorMessage":"Error details（human readable）",
-            "cause":"Reason for the error (optional)"
-        }
-        */
 		exit;
 	}
 	public static $codes = array(

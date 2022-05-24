@@ -2,7 +2,7 @@
 header('content-type:application/json;charset=utf-8');
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/include.php');
 if (cmethod::isPost() == false) {
-    exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','The request method is not supported');
+    exceptions::doErr(405,'HTTP/1.1 405 Method not allowed','The request method is not supported', 10);
     exit;
 }
 $check_post_data = array(
@@ -10,33 +10,33 @@ $check_post_data = array(
 );
 $data = json_decode(file_get_contents('php://input'),true,10);
 if ($data == null) {
-    exceptions::doErr(400,'IllegalArgumentException','Input is not JSON');
+    exceptions::doErr(400,'IllegalArgumentException','Input is not JSON', 4);
     exit;
 }
 foreach ($check_post_data as $v) {
     if (!isset($data[$v])) {
-        exceptions::doErr(400,'IllegalArgumentException','Missing parameters');
+        exceptions::doErr(400,'IllegalArgumentException','Missing parameters', 12);
         exit;
     }
 }
-$email = $data['username'];
-$passwd = $data['password'];
-if ($email == '' or $passwd == '') {
-    exceptions::doErr(403,'ForbiddenOperationException','Email or password cannot be empty');
+$username = safe_input($data['username']);
+$passwd = safe_input($data['password']);
+if ($username == '' or $passwd == '') {
+    exceptions::doErr(403,'ForbiddenOperationException','Email or password cannot be empty', 13);
     exit;
 }
 //header("Content-Type: application/json; charset=utf-8");
-if (!$db->isAvailable($email)) {
-    exceptions::doErr(404,'ForbiddenOperationException','The account you entered does not exist');
+if (!$db->isAvailableUserName($username)) {
+    exceptions::doErr(404,'ForbiddenOperationException','The account you entered does not exist', 26);
     exit;
 }
-if (!$db->chkPasswd($email,$passwd)) {
-    exceptions::doErr(403,'ForbiddenOperationException','The email or password you entered is incorrect');
+if (!$db->chkPasswd($username,$passwd)) {
+    exceptions::doErr(403,'ForbiddenOperationException','The email or password you entered is incorrect', 15);
     exit;
 }
-$available_userid = $db->getUserid($email);
+$available_userid = $db->getUserid($username);
 $db->killTokensByOwner($available_userid);
 
-header(Exceptions::$codes[204]);
+//header(Exceptions::$codes[204]);
 $respdata = array("status" => "OK");
 echo json_encode($respdata);

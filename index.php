@@ -1,7 +1,8 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'] . '/inc/include.php');
 
-function do404() {
+function do404()
+{
 	global $servername, $impname, $impver, $homepage, $regurl, $skinurl, $publickey;
 	global $db, $client_ip_int;
 
@@ -19,8 +20,10 @@ if ($_SERVER["REQUEST_URI"] != "/index.php") {
 			include "inc/sessionserver/session/minecraft/profile/index.php";
 		}
 	} else {
-		if (! (include "inc" . $requri . "/index.php")) {
-			do404();
+		if ($db->allowIp($client_ip_int)) {
+			if (!(include "inc" . $requri . "/index.php")) {
+				do404();
+			}
 		}
 	}
 } else {

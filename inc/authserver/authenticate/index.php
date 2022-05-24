@@ -3,7 +3,7 @@ header('content-type:application/json;charset=utf-8');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/inc/include.php');
 if (cmethod::isPost() == false) {
 	$db->updIp404($client_ip_int);
-	exceptions::doErr(405, 'HTTP/1.1 405 Method not allowed', 'The request method is not supported');
+	exceptions::doErr(405, 'HTTP/1.1 405 Method not allowed', 'The request method is not supported', 10);
 	exit;
 }
 $check_post_data = array(
@@ -12,37 +12,37 @@ $check_post_data = array(
 $data = json_decode(file_get_contents('php://input'), true, 10);
 if ($data == null) {
 	$db->updIp404($client_ip_int);
-	exceptions::doErr(400, 'IllegalArgumentException', 'Submitted data is not JSON data');
+	exceptions::doErr(400, 'IllegalArgumentException', 'Submitted data is not JSON data', 4);
 	exit;
 }
 foreach ($check_post_data as $v) {
 	if (!isset($data[$v])) {
 		$db->updIp404($client_ip_int);
-		exceptions::doErr(400, 'IllegalArgumentException', 'Missing parameters');
+		exceptions::doErr(400, 'IllegalArgumentException', 'Missing parameters', 12);
 		exit;
 	}
 }
-$email = $data['username'];
-$passwd = $data['password'];
-if ($email == '' or $passwd == '') {
+$username = safe_input($data['username']);
+$passwd = safe_input($data['password']);
+if ($username == '' or $passwd == '') {
 	$db->updIpAuthFail($client_ip_int);
-	exceptions::doErr(403, 'ForbiddenOperationException', 'Email or password cannot be empty');
+	exceptions::doErr(403, 'ForbiddenOperationException', 'Email or password cannot be empty', 13);
 	exit;
 }
 //header("Content-Type: application/json; charset=utf-8");
-if ($db->isAvailable($email)) {
+if ($db->isAvailableUserName($username)) {
 	$db->updIpAuthFail($client_ip_int);
-	exceptions::doErr(404, 'ForbiddenOperationException', 'The account you entered does not exist');
+	exceptions::doErr(404, 'ForbiddenOperationException', 'The email or password you entered is incorrect', 14);
 	exit;
 }
-if (!$db->chkPasswd($email, $passwd)) {
+if (!$db->chkPasswd($username, $passwd)) {
 	$db->updIpAuthFail($client_ip_int);
-	exceptions::doErr(403, 'ForbiddenOperationException', 'The email or password you entered is incorrect');
+	exceptions::doErr(403, 'ForbiddenOperationException', 'The email or password you entered is incorrect', 15);
 	exit;
 }
-$userid = UUID::getUserUuid(md5($email));
-$db->updateUser($email, $userid);
-$available_userid = $db->getUserid($email);
+$userid = UUID::getUserUuid(md5($username));
+$db->updateUser($username, $userid);
+$available_userid = $db->getUserid($username);
 if (!isset($data['clientToken'])) {
 	$cli_token = UUID::getUserUuid(md5(md5(uniqid()) . $available_userid));
 } else {

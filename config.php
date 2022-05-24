@@ -20,9 +20,6 @@ $privKeyFileName = $_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-private-key.pem";
 $publickey = file_get_contents($pubKeyFileName); //public key file
 $privatekey = file_get_contents($privKeyFileName); //private key
 
-//Genuine direct login support
-$mojanglogin = false;
-
 function ip2long_v6($ip) {
 	$ip_n = inet_pton($ip);
 	$bin = '';
@@ -79,13 +76,20 @@ function ip_to_int($ip) {
 	}
 }
 
+function strip_input($txt) {
+	return htmlspecialchars(stripslashes(trim($txt)));
+}
 function strip_sql_chars($txt) {
+	$txt = stripslashes($txt);
 	$txt = str_replace("'", "-", $txt);
 	$txt = str_replace('"', "-", $txt);
 	return $txt;
 }
 function safe_input($txt) {
 	return trim(htmlspecialchars(strip_sql_chars($txt)));
+}
+function isvalid_input($txt) {
+	return $txt == safe_input($txt);
 }
 
 $client_ip = $_SERVER['REMOTE_ADDR'];
