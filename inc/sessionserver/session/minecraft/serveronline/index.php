@@ -39,8 +39,16 @@ if (strlen($server_id) < 4) {
 	exceptions::doErr(403, 'ForbiddenOperationException', 'server_id too short', 37);
 	exit;
 }
+if (strlen($server_id) > 79) {
+	exceptions::doErr(403, 'ForbiddenOperationException', 'server_id too long', 42);
+	exit;
+}
 if (strlen($str_name) < 4) {
 	exceptions::doErr(403, 'ForbiddenOperationException', 'name too short', 38);
+	exit;
+}
+if (strlen($str_name) > 79) {
+	exceptions::doErr(403, 'ForbiddenOperationException', 'name too long', 43);
 	exit;
 }
 if ($char_is_public != 'Y' && $char_is_public != 'N') {

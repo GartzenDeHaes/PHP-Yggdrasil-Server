@@ -26,30 +26,28 @@ class database
 
 			$sql = "CREATE TABLE IF NOT EXISTS [users] (" . PHP_EOL .
 				"[uid] INTEGER PRIMARY KEY," . PHP_EOL .
-				"[username] NVARCHAR(50) NOT NULL DEFAULT '' UNIQUE," . PHP_EOL .
-				"[password] NVARCHAR(32) NOT NULL DEFAULT ''," . PHP_EOL .
-				"[email] NVARCHAR(32) NOT NULL UNIQUE," . PHP_EOL .
-				"[myid] VARCHAR(30) NOT NULL DEFAULT ''," . PHP_EOL .
+				"[username] NVARCHAR(32) NOT NULL UNIQUE," . PHP_EOL .
+				"[password] NVARCHAR(32) NOT NULL," . PHP_EOL .
+				"[email] NVARCHAR(32) UNIQUE," . PHP_EOL .
+				"[myid] VARCHAR(32) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[myidkey] VARCHAR(16) NOT NULL DEFAULT ''," . PHP_EOL .
-				"[regip] VARCHAR(50) NOT NULL DEFAULT ''," . PHP_EOL .
+				"[regip] VARCHAR(40) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[regdate] INTEGER(10) NOT NULL DEFAULT 0," . PHP_EOL .
-				"[lastloginip] INTEGER(10) NOT NULL DEFAULT 0," . PHP_EOL .
+				"[lastloginip] INTEGER NOT NULL DEFAULT 0," . PHP_EOL .
 				"[lastlogintime] INTEGER(10) NOT NULL DEFAULT 0," . PHP_EOL .
 				"[salt] CHAR(6) NOT NULL DEFAULT 'salty'," . PHP_EOL .
-				"[secques] NVARCHAR(50) NOT NULL DEFAULT ''," . PHP_EOL .
+				"[secques] NVARCHAR(32) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[vtime] INTEGER(11) NOT NULL DEFAULT 0," . PHP_EOL .
-				"[userid] VARCHAR(50) UNIQUE," . PHP_EOL .
-				"[uuid] VARCHAR(50) DEFAULT NULL," . PHP_EOL .
-				"[texturedata] TEXT NOT NULL DEFAULT ''," . PHP_EOL .
-				"[mojang] VARCHAR(255) DEFAULT 'false'," . PHP_EOL .
-				"[space] VARCHAR(50) DEFAULT '&nbsp')" . PHP_EOL;
+				"[userid] VARCHAR(32) UNIQUE," . PHP_EOL .
+				"[uuid] VARCHAR(30) DEFAULT NULL" . PHP_EOL .
+				")" . PHP_EOL;
 			$this->mysqli->exec($sql);
 			$this->mysqli->exec("CREATE INDEX users_email_idx ON users (email);");
 
 			$sql = "CREATE TABLE IF NOT EXISTS [sessions] (" . PHP_EOL .
 				"[server_id] VARCHAR(128) NOT NULL," . PHP_EOL .
 				"[acc_token] VARCHAR(50) NOT NULL," . PHP_EOL .
-				"[ipaddr] VARCHAR(20) DEFAULT NULL," . PHP_EOL .
+				"[ipaddr] VARCHAR(40) DEFAULT NULL," . PHP_EOL .
 				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP, ". PHP_EOL .
 				"PRIMARY KEY([server_id], [acc_token]) )" . PHP_EOL;
 			$this->mysqli->exec($sql);
@@ -63,17 +61,11 @@ class database
 				"[owner_uuid] VARCHAR(50) NOT NULL )" . PHP_EOL;
 			$this->mysqli->exec($sql);
 
-			$sql = "CREATE TABLE IF NOT EXISTS [vailtoken] (" . PHP_EOL .
-				"[id] int(10) PRIMARY KEY," . PHP_EOL .
-				"[token] varchar(255) DEFAULT NULL," . PHP_EOL .
-				"[vtime] TIMESTAMP DEFAULT CURRENT_TIMESTAMP )" . PHP_EOL;
-			$this->mysqli->exec($sql);
-
 			$sql = "CREATE TABLE IF NOT EXISTS [servers] (" . PHP_EOL .
-				"[server_id] VARCHAR(128) NOT NULL PRIMARY KEY," . PHP_EOL .
+				"[server_id] VARCHAR(80) NOT NULL PRIMARY KEY," . PHP_EOL .
 				"[created_ip] INTEGER NOT NULL," . PHP_EOL .
 				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP,". PHP_EOL .
-				"[name] VARCHAR(255) NOT NULL," . PHP_EOL .
+				"[name] VARCHAR(80) NOT NULL," . PHP_EOL .
 				"[server_token] VARCHAR(50) NOT NULL," . PHP_EOL .
 				"[salt] VARCHAR(16) NOT NULL," . PHP_EOL .
 				"[host] VARCHAR(80) NOT NULL," . PHP_EOL .
@@ -370,8 +362,8 @@ class database
 		$this->query_change("delete from sessions where o_time <= DATETIME('now', '-120 minutes');");
 	}
 	function updateSkinData($uuid) {
-		$texturedata = "texturedata for".$uuid; // = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
-		$this->query_change("update users set texturedata = '" . $texturedata . "' where uuid = '" . $uuid . "';");
+		//$texturedata = "texturedata for".$uuid; // = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
+		//$this->query_change("update users set texturedata = '" . $texturedata . "' where uuid = '" . $uuid . "';");
 	}
 	function addPlayerInfo($playername, $playeruuid) {
 		$ret = $this->query("select * from chkname where uuid = '" . $playeruuid . "'");
