@@ -162,7 +162,7 @@ class database
 		return false;
 	}
 	function getServers() {
-		$ret = $this->query("SELECT server_id, [name], ipaddr, port, [version], max_users, cur_users, lang, region, updated_dts FROM servers ORDER BY cur_users DESC;");
+		$ret = $this->query("SELECT server_id, [name], host, port, [version], max_users, cur_users, lang, region, updated_dts FROM servers ORDER BY cur_users DESC;");
 		return $ret;
 	}
 	function creOrUpdServer($server_id, $server_token, $host, $str_name, $str16_salt, $int_port, $int_prot_ver, $char_is_public, $int_max_users) {
@@ -172,7 +172,10 @@ class database
 			$this->query_change("UPDATE servers SET host='".$host."', name='".$str_name."', salt='".$str16_salt."', port=".$int_port.", version=".$int_prot_ver.", ispublic='".$char_is_public."', max_users=".$int_max_users.", updated_dts=CURRENT_TIMESTAMP WHERE server_id='".$server_id."';");
 			return true;
 		} else {
-			if (! $this->getServerById($server_id)) {
+			if ($this->getServerById($server_id)) {
+				// server exists, but token doesn't match.  this means the server changed their salt or someone is tying to use the same name
+				$this->query_change("UPDATE ips SET auth_fail = auth_fail + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=".$client_ip_int.";");
+			} else {
 				$this->query_change("INSERT INTO servers (server_id, server_token, host, [name], salt, port, [version], ispublic, max_users, created_ip) VALUES ('".$server_id."', '".$server_token."', '".$host."', '".$str_name."', '".$str16_salt."', ".$int_port.", ".$int_prot_ver.", '".$char_is_public."', ".$int_max_users.", ".$client_ip_int.");");
 				$this->query_change("UPDATE ips SET srv_count = srv_count + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=".$client_ip_int.";");
 				return true;

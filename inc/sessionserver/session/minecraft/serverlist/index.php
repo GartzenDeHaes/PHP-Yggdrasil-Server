@@ -48,22 +48,24 @@ if (! is_numeric($start) || $start < 0) {
 	$start = 0;
 }
 
-if ($db->getServers()) {
-	$db->updIpAuthFail($client_ip_int);
-	exceptions::doErr(404, 'ForbiddenOperationException', 'Unauthorized');
+if (! $ret = $db->getServers()) {
+	exceptions::doErr(404, 'ForbiddenOperationException', 'Internal error');
 	exit;
 }
 
 $respdata = array();
+$slist = array();
 $count = 0;
 
 // server_id, name, ipaddr, port, version, max_users, cur_users, lang, region, updated_dts
 while ($res = $ret->fetchArray() AND $limit > 0) {
 	if ($count >= $start) {
-		array_push($respdata, $res);
+		array_push($slist, $res);
 		$limit = $limit - 1;
 	}
 	$count = $count + 1;
 }
+$respdata["servers"] = $slist;
+$respdata["status"] = "OK";
 
 echo json_encode($respdata);

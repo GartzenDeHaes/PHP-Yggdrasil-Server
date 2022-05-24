@@ -92,7 +92,7 @@ input {background:linen;};
 </style>
 </head>
 <body bgcolor="black">
-<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
 &nbsp;<br/>
 <div style="<?php echo $inpageStyle ?>">
 <table width=400px bgcolor=green cellpadding=2><tr><td>

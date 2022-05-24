@@ -58,7 +58,9 @@ $tokens = $db->getTokensByOwner($available_userid);
 $profile = $db->getProfileByOwner($available_userid);
 $authdata = array(
 	"accessToken" => $tokens[0],
-	"clientToken" => $tokens[1]
+	"clientToken" => $tokens[1],
+	"username" => $profile->name,
+	"status" => "OK"
 );
 if ($profile !== null) {
 	$db->profileToken($tokens[0], $profile->UUID);
@@ -72,5 +74,4 @@ if ($req_user) {
 	$authdata["user"] = (new User($data["username"], "", $userid, "en_US"))->getArrayFormated();
 }
 
-$authdata["status"] = "OK";
 echo json_encode($authdata);
