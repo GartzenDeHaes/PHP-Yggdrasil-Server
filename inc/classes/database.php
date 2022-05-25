@@ -193,8 +193,6 @@ class database
 	}
 	function isAvailable($email) {
 		$ret = $this->query("select * from users where email = '" . $email . "'");
-		// this doesn't work for some reason
-		//return $ret->fetchArray();
 		while ($row = $ret->fetchArray()) {
 			return false;
 		}
@@ -270,7 +268,7 @@ class database
 	function getProfileByOwner($userid) {
 		$ret = $this->query("select * from users where userid = '" . $userid . "'");
 		if ($rec = $ret->fetchArray()) {
-			return new Profile($rec[1], $rec[14], $rec[15]);
+			return new Profile($rec["username"], $rec["userid"], $rec["uuid"]);
 		}
 		return false;
 	}
@@ -358,7 +356,6 @@ class database
 		return false;
 	}
 	function updateAllSessionState() {
-		//$this->query_change("delete from sessions where date(o_time) <= date_sub(now(),interval 30 second);");
 		$this->query_change("delete from sessions where o_time <= DATETIME('now', '-120 minutes');");
 	}
 	function updateSkinData($uuid) {
