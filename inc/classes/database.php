@@ -12,11 +12,11 @@ class database
 
 		if (!$dbexists) {
 			$sql = "CREATE TABLE IF NOT EXISTS [chkname] (" . PHP_EOL .
-				"[uuid] varchar(50) PRIMARY KEY," . PHP_EOL .
+				"[uuid] varchar(32) PRIMARY KEY," . PHP_EOL .
 				"[playername] varchar(30) NOT NULL UNIQUE" . PHP_EOL .
 				");" . PHP_EOL;
 			$this->mysqli->exec($sql);
-			
+
 			// uid			NOT USED
 			// username		Entered by user on registration page
 			// userid		Same as username
@@ -39,32 +39,32 @@ class database
 				"[secques] NVARCHAR(32) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[vtime] INTEGER(11) NOT NULL DEFAULT 0," . PHP_EOL .
 				"[userid] VARCHAR(32) UNIQUE," . PHP_EOL .
-				"[uuid] VARCHAR(30) DEFAULT NULL" . PHP_EOL .
+				"[uuid] VARCHAR(32) DEFAULT NULL" . PHP_EOL .
 				")" . PHP_EOL;
 			$this->mysqli->exec($sql);
 			$this->mysqli->exec("CREATE INDEX users_email_idx ON users (email);");
 
 			$sql = "CREATE TABLE IF NOT EXISTS [sessions] (" . PHP_EOL .
 				"[server_id] VARCHAR(128) NOT NULL," . PHP_EOL .
-				"[acc_token] VARCHAR(50) NOT NULL," . PHP_EOL .
+				"[acc_token] VARCHAR(32) NOT NULL," . PHP_EOL .
 				"[ipaddr] VARCHAR(40) DEFAULT NULL," . PHP_EOL .
-				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP, ". PHP_EOL .
+				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " . PHP_EOL .
 				"PRIMARY KEY([server_id], [acc_token]) )" . PHP_EOL;
 			$this->mysqli->exec($sql);
 
 			$sql = "CREATE TABLE IF NOT EXISTS [tokens] (" . PHP_EOL .
-				"[acc_token] VARCHAR(50) PRIMARY KEY," . PHP_EOL .
-				"[cli_token] VARCHAR(50) NOT NULL," . PHP_EOL .
+				"[acc_token] VARCHAR(32) PRIMARY KEY," . PHP_EOL .
+				"[cli_token] VARCHAR(32) NOT NULL," . PHP_EOL .
 				"[profile] VARCHAR(50) DEFAULT NULL," . PHP_EOL .
 				"[ptime] TIMESTAMP DEFAULT CURRENT_TIMESTAMP," . PHP_EOL .
 				"[state] INT(1) NOT NULL DEFAULT 1," . PHP_EOL .
-				"[owner_uuid] VARCHAR(50) NOT NULL )" . PHP_EOL;
+				"[owner_uuid] VARCHAR(32) NOT NULL )" . PHP_EOL;
 			$this->mysqli->exec($sql);
 
 			$sql = "CREATE TABLE IF NOT EXISTS [servers] (" . PHP_EOL .
 				"[server_id] VARCHAR(80) NOT NULL PRIMARY KEY," . PHP_EOL .
 				"[created_ip] INTEGER NOT NULL," . PHP_EOL .
-				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP,". PHP_EOL .
+				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP," . PHP_EOL .
 				"[name] VARCHAR(80) NOT NULL," . PHP_EOL .
 				"[server_token] VARCHAR(50) NOT NULL," . PHP_EOL .
 				"[salt] VARCHAR(16) NOT NULL," . PHP_EOL .
@@ -114,15 +114,15 @@ class database
 		return true;  // $this->myslqi->changes() ???
 	}
 	function creIpRec($iplong) {
-		$ret = $this->query("SELECT * FROM ips WHERE ip = ".$iplong.";");
+		$ret = $this->query("SELECT * FROM ips WHERE ip = " . $iplong . ";");
 		if ($ret && $row = $ret->fetchArray()) {
-			$this->query_change("UPDATE ips SET last_dts = CURRENT_TIMESTAMP WHERE ip = ".$iplong.";");
+			$this->query_change("UPDATE ips SET last_dts = CURRENT_TIMESTAMP WHERE ip = " . $iplong . ";");
 			return;
 		}
-		$this->query_change("INSERT INTO ips (ip) VALUES (".$iplong.");");
+		$this->query_change("INSERT INTO ips (ip) VALUES (" . $iplong . ");");
 	}
 	function allowIp($iplong) {
-		$ret = $this->query("SELECT * FROM ips WHERE ip = ".$iplong.";");
+		$ret = $this->query("SELECT * FROM ips WHERE ip = " . $iplong . ";");
 		if ($rec = $ret->fetchArray()) {
 			if ($rec["is_banned"] != 'N') {
 				return false;
@@ -131,13 +131,13 @@ class database
 		return true;
 	}
 	function updIp404($iplong) {
-		$this->query_change("UPDATE ips SET bad_req = bad_req + 1, last_dts = CURRENT_TIMESTAMP WHERE ip = ".$iplong.";");
+		$this->query_change("UPDATE ips SET bad_req = bad_req + 1, last_dts = CURRENT_TIMESTAMP WHERE ip = " . $iplong . ";");
 	}
 	function updIpStrikes($iplong) {
-		$this->query_change("UPDATE ips SET strikes = strikes + 1,  last_dts = CURRENT_TIMESTAMP WHERE ip = ".$iplong.";");
+		$this->query_change("UPDATE ips SET strikes = strikes + 1,  last_dts = CURRENT_TIMESTAMP WHERE ip = " . $iplong . ";");
 	}
 	function updIpAuthFail($iplong) {
-		$this->query_change("UPDATE ips SET auth_fail = auth_fail + 1,  last_dts = CURRENT_TIMESTAMP WHERE ip = ".$iplong.";");
+		$this->query_change("UPDATE ips SET auth_fail = auth_fail + 1,  last_dts = CURRENT_TIMESTAMP WHERE ip = " . $iplong . ";");
 	}
 	function getServerById($server_id) {
 		$ret = $this->query("SELECT * FROM servers WHERE server_id = '" . $server_id . "';");
@@ -147,7 +147,7 @@ class database
 		return false;
 	}
 	function getServer($server_id, $server_token) {
-		$ret = $this->query("SELECT * FROM servers WHERE server_id = '" . $server_id . "' AND server_token='".$server_token."';");
+		$ret = $this->query("SELECT * FROM servers WHERE server_id = '" . $server_id . "' AND server_token='" . $server_token . "';");
 		if ($rec = $ret->fetchArray()) {
 			return $rec;
 		}
@@ -161,15 +161,15 @@ class database
 		global $client_ip_int;
 
 		if ($this->getServer($server_id, $server_token)) {
-			$this->query_change("UPDATE servers SET host='".$host."', name='".$str_name."', salt='".$str16_salt."', port=".$int_port.", version=".$int_prot_ver.", ispublic='".$char_is_public."', max_users=".$int_max_users.", updated_dts=CURRENT_TIMESTAMP WHERE server_id='".$server_id."';");
+			$this->query_change("UPDATE servers SET host='" . $host . "', name='" . $str_name . "', salt='" . $str16_salt . "', port=" . $int_port . ", version=" . $int_prot_ver . ", ispublic='" . $char_is_public . "', max_users=" . $int_max_users . ", updated_dts=CURRENT_TIMESTAMP WHERE server_id='" . $server_id . "';");
 			return true;
 		} else {
 			if ($this->getServerById($server_id)) {
 				// server exists, but token doesn't match.  this means the server changed their salt or someone is tying to use the same name
-				$this->query_change("UPDATE ips SET auth_fail = auth_fail + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=".$client_ip_int.";");
+				$this->query_change("UPDATE ips SET auth_fail = auth_fail + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=" . $client_ip_int . ";");
 			} else {
-				$this->query_change("INSERT INTO servers (server_id, server_token, host, [name], salt, port, [version], ispublic, max_users, created_ip) VALUES ('".$server_id."', '".$server_token."', '".$host."', '".$str_name."', '".$str16_salt."', ".$int_port.", ".$int_prot_ver.", '".$char_is_public."', ".$int_max_users.", ".$client_ip_int.");");
-				$this->query_change("UPDATE ips SET srv_count = srv_count + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=".$client_ip_int.";");
+				$this->query_change("INSERT INTO servers (server_id, server_token, host, [name], salt, port, [version], ispublic, max_users, created_ip) VALUES ('" . $server_id . "', '" . $server_token . "', '" . $host . "', '" . $str_name . "', '" . $str16_salt . "', " . $int_port . ", " . $int_prot_ver . ", '" . $char_is_public . "', " . $int_max_users . ", " . $client_ip_int . ");");
+				$this->query_change("UPDATE ips SET srv_count = srv_count + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=" . $client_ip_int . ";");
 				return true;
 			}
 		}
@@ -179,9 +179,9 @@ class database
 		global $client_ip_int;
 
 		if ($this->getServer($server_id, $server_token)) {
-			$this->query_change("UPDATE servers SET host='".$host."', name='".$str_name."', port=".$int_port.", version=".$int_prot_ver.", ispublic='".$char_is_public."', max_users='".$int_max_users."', cur_users='".$cur_users."', updated_dts=CURRENT_TIMESTAMP WHERE server_id='".$server_id."';");
+			$this->query_change("UPDATE servers SET host='" . $host . "', name='" . $str_name . "', port=" . $int_port . ", version=" . $int_prot_ver . ", ispublic='" . $char_is_public . "', max_users='" . $int_max_users . "', cur_users='" . $cur_users . "', updated_dts=CURRENT_TIMESTAMP WHERE server_id='" . $server_id . "';");
 		} else {
-			$this->query_change("UPDATE ips SET heart_fail = heart_fail + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=".$client_ip_int.";");
+			$this->query_change("UPDATE ips SET heart_fail = heart_fail + 1, last_dts=CURRENT_TIMESTAMP WHERE ip=" . $client_ip_int . ";");
 		}
 	}
 	function isAvailableUserName($unm) {
@@ -203,7 +203,7 @@ class database
 
 		return $this->query("insert into [users] ([userid], [username], [password], [email], [secques], [regip], [salt]) VALUES ('" . $username . "', '" . $username . "', '" . $encrypted . "', '" . $email . "', '" . $secqu . "', '" . $userip . "', '" . $saltChar6 . "');");
 	}
-	function chkPasswd($username, $passwd) {
+	function chkPasswd($username, $passwd)	{
 		$ret = $this->query("select * from users where username = '" . $username . "'");
 		if ($rec = $ret->fetchArray()) {
 			$ucpass = $rec["password"];
@@ -229,14 +229,14 @@ class database
 	function updateUser($username, $userid) {
 		$this->query_change("update users set lastlogintime = '" . time() . "', userid = '" . $userid . "' where username = '" . $username . "';");
 	}
-	function getUserid($username) {
+	function getUserid($username)	{
 		$ret = $this->query("select * from users where username = '" . $username . "'");
 		if ($rec = $ret->fetchArray()) {
-			return $rec[13];
+			return $rec['userid'];
 		}
 		return false;
 	}
-	function creToken($cli_token, $userid) {
+	function creToken($cli_token, $userid)	{
 		$acctoken = UUID::getUserUuid(uniqid() . $cli_token);
 		$ret = $this->query("select * from tokens where owner_uuid = '" . $userid . "';");
 		if ($rec = $ret->fetchArray()) {
@@ -248,7 +248,7 @@ class database
 	function getTokensByOwner($user_uuid) {
 		$ret = $this->query("select * from tokens where owner_uuid = '" . $user_uuid . "';");
 		if ($rec = $ret->fetchArray()) {
-			return array($rec[0], $rec[1]);
+			return array($rec['acc_token'], $rec['cli_token']);
 		}
 		return false;
 	}
@@ -278,7 +278,7 @@ class database
 	function getUseridByAcctoken($acctoken) {
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
 		if ($rec = $ret->fetchArray()) {
-			return $rec[5];
+			return $rec['owner_uuid'];
 		}
 		return false;
 	}
@@ -292,7 +292,7 @@ class database
 	function chkAcctoken($acctoken, $clitoken) {
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
 		if ($rec = $ret->fetchArray()) {
-			return ($clitoken == $rec[1]);
+			return ($clitoken == $rec['cli_token']);
 		}
 		return false;
 	}
@@ -306,7 +306,7 @@ class database
 	function setTokenState($acctoken) {
 		$this->query_change("update tokens set state = -1 where acc_token = '" . $acctoken . "';");
 	}
-	function killTokensByOwner($userid) {
+	function killTokensByOwner($userid)	{
 		$this->query_change("update tokens set state = -1 where owner_uuid = '" . $userid . "';");
 	}
 	function updateAllTokenState() {
@@ -317,7 +317,7 @@ class database
 	function chkProfileToken($acctoken, $player_uuid) {
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
 		if ($rec = $ret->fetchArray()) {
-			return ($player_uuid == $rec[2]);
+			return ($player_uuid == $rec['owner_uuid']);
 		}
 		return false;
 	}
@@ -327,42 +327,52 @@ class database
 	function chkSession($playername, $serverid, $ipaddr) {
 		$ret = $this->query("select * from sessions where server_id = '" . $serverid . "'");
 		if ($rec = $ret->fetchArray()) {
-			$owner_accctoken = $rec[1];
+			$owner_accctoken = $rec['acc_token'];
 			$owner_userid = $this->getUseridByAcctoken($owner_accctoken);
-			$player = $this->getProfileByOwner($owner_userid)->name;
-			return (($player == $playername) && ($ipaddr == 'NONE' || $ipaddr == $rec[2]));
+			if ($owner_userid) {
+				if ($profl = $this->getProfileByOwner($owner_userid)) {
+					$player = $profl->name;
+				} else {
+					$player = "not found";
+				}
+				return (($player == $playername) && ($ipaddr == 'NONE' || $ipaddr == $rec[2]));
+			}
 		}
 		return false;
 	}
 	function getAcctokenByServerid($serverid) {
 		$ret = $this->query("select * from sessions where server_id = '" . $serverid . "';");
 		if ($rec = $ret->fetchArray()) {
-			return $rec[1];
+			return $rec['acc_token'];
 		}
 		return false;
 	}
 	function getProfileByUuid($playeruuid) {
 		$ret = $this->query("select * from users where uuid = '" . $playeruuid . "';");
 		if ($rec = $ret->fetchArray()) {
-			return new Profile($rec[1], $rec[14], $rec[15]);
+			return new Profile($rec['username'], $rec['userid'], $rec['uuid']);
 		}
 		return false;
 	}
-	function getProfileByPlayer($playername) {
+	function getProfileByPlayer($playername)
+	{
 		$ret = $this->query("select * from users where username = '" . $playername . "';");
 		if ($rec = $ret->fetchArray()) {
-			return new Profile($rec[1], $rec[14], $rec[15]);
+			return new Profile($rec['username'], $rec['userid'], $rec['uuid']);
 		}
 		return false;
 	}
-	function updateAllSessionState() {
+	function updateAllSessionState()
+	{
 		$this->query_change("delete from sessions where o_time <= DATETIME('now', '-120 minutes');");
 	}
-	function updateSkinData($uuid) {
+	function updateSkinData($uuid)
+	{
 		//$texturedata = "texturedata for".$uuid; // = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
 		//$this->query_change("update users set texturedata = '" . $texturedata . "' where uuid = '" . $uuid . "';");
 	}
-	function addPlayerInfo($playername, $playeruuid) {
+	function addPlayerInfo($playername, $playeruuid)
+	{
 		$ret = $this->query("select * from chkname where uuid = '" . $playeruuid . "'");
 		if ($rec = $ret->fetchArray()) {
 			$this->query_change("update chkname set playername = '" . $playername . "' where uuid = '" . $playeruuid . "';");
@@ -370,14 +380,16 @@ class database
 			$this->query_change("insert into chkname (uuid, playername) values ('" . $playeruuid . "', '" . $playername . "');");
 		}
 	}
-	function getPlayerUuidByAcctoken($acctoken) {
+	function getPlayerUuidByAcctoken($acctoken)
+	{
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
 		if ($rec = $ret->fetchArray()) {
-			return $rec[2];
+			return $rec['owner_uuid'];
 		}
 		return false;
 	}
-	function isPlayerNameChanged($uuid) {
+	function isPlayerNameChanged($uuid)
+	{
 		$getname = $this->query("select * from users where uuid = '" . $uuid . "';");
 		if ($recname = $getname->fetchArray(SQLITE3_NUM)) {
 			$getsavedname = $this->query("select * from chkname where uuid = '" . $uuid . "';");
