@@ -7,11 +7,15 @@ $skinurl = array(
     ".zhjlfx.cn",//Skin station link, you can fill in multiple
     ".minecraft.net"
 );
-//$homepage = "https://portlandsoft.works"; //website homepage
-//$regurl = "https://portlandsoft.works/registration"; //Player registration address
 
-$homepage = "http://localhost"; //website homepage
-$regurl = "http://localhost/registration"; //Player registration address
+$web_protocol = "http";
+//$web_protocol = "https";
+$rootserver = "localhost";
+//$rootserver = "portlandsoft.works";
+
+$homepage = $web_protocol."://".$rootserver; //website homepage
+$regurl = $homepage."/registration_test"; //Player registration address
+
 //External login server key configuration//
 
 $pubKeyFileName = $_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-public-key.pem";

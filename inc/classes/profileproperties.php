@@ -15,7 +15,6 @@ class ProfileProperties
 
 	public function __toString()
 	{
-
 		return json_encode($this->getArrayFormated());
 	}
 	public function getArrayFormated()

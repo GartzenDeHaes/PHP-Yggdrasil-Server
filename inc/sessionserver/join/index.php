@@ -36,6 +36,6 @@ if ($db->getTokenState($acctoken) < 0) {
 $ip = $_SERVER['REMOTE_ADDR'];
 $db->creSession($serverid,$acctoken,$ip);
 
-header(Exceptions::$codes[204]);
+//header(Exceptions::$codes[204]);
 $respdata = array("status" => "OK");
 echo json_encode($respdata);

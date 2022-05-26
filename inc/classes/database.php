@@ -322,7 +322,7 @@ class database
 		return false;
 	}
 	function creSession($server_id, $acc_token, $ip) {
-		$this->query_change("insert into sessions (server_id, acc_token, ipaddr, o_time) values ('" . $server_id . "','" . $acc_token . "','" . $ip . "', now());");
+		$this->query_change("insert into sessions (server_id, acc_token, ipaddr, o_time) values ('" . $server_id . "','" . $acc_token . "','" . $ip . "', CURRENT_TIMESTAMP);");
 	}
 	function chkSession($playername, $serverid, $ipaddr) {
 		$ret = $this->query("select * from sessions where server_id = '" . $serverid . "'");
