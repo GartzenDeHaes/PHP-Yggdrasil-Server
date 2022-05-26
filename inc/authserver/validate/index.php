@@ -31,15 +31,15 @@ if (!isset($clitoken)) {
 if (!$db->isAcctokenAvailable($acctoken)) {
     exceptions::doErr(403,'ForbiddenOperationException','The Token does not exist', 16);
 }
-if (!(isset($clitoken) == $db->chkAcctoken($acctoken,$clitoken))) {
+if (!(isset($clitoken) == $db->chkAcctoken($acctoken, $clitoken))) {
     exceptions::doErr(403,'ForbiddenOperationException','The specified ClientToken is invalid', 17);
 }
 if ($db->getTokenState($acctoken) < 0) {
     exceptions::doErr(403,'ForbiddenOperationException','The Token has expired', 18);
 }
-if($db->isPlayerNameChanged($uuid)){
-    $db->setTokenState($acctoken);
-}
+// if($db->isPlayerNameChanged($uuid)){
+//     $db->setTokenState($acctoken);
+// }
 // no content
 //header(Exceptions::$codes[204]);
 

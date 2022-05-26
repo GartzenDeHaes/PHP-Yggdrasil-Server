@@ -33,9 +33,14 @@ if (!(isset($selected) == $db->chkProfileToken($acctoken,$selected))) {
 if ($db->getTokenState($acctoken) < 0) {
     exceptions::doErr(403,'ForbiddenOperationException','The Token has expired',18);
 }
-$ip = $_SERVER['REMOTE_ADDR'];
-$db->creSession($serverid,$acctoken,$ip);
+
+//$ip = $_SERVER['REMOTE_ADDR'];
+$cli_token = $db->creSession($serverid, $acctoken);
+$db->updTokenCli($acctoken, $cli_token);
 
 //header(Exceptions::$codes[204]);
-$respdata = array("status" => "OK");
+$respdata = array(
+	"cli_token" => $cli_token,
+	"status" => "OK" 
+);
 echo json_encode($respdata);

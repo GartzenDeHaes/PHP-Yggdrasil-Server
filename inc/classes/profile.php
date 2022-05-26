@@ -18,7 +18,7 @@ class Profile
 
 	public function getArrayFormated()
 	{
-		$texture_data = (new ProfileProperties("textures", base64_encode($this->texture)))->getArrayFormated();
+		$texture_data = (new ProfileProperties("textures", base64_encode("nope")))->getArrayFormated();
 		$dataarr = array(
 			"id" => $this->UUID,
 			"name" => $this->name,

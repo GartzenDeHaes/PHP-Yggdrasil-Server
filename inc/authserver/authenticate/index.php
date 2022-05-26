@@ -43,22 +43,18 @@ if (!$db->chkPasswd($username, $passwd)) {
 $userid = UUID::getUserUuid(md5($username));
 $db->updateUser($username, $userid);
 $available_userid = $db->getUserid($username);
-if (!isset($data['clientToken'])) {
-	$cli_token = UUID::getUserUuid(md5(md5(uniqid()) . $available_userid));
-} else {
-	$cli_token = $data['clientToken'];
-}
+$tokens = $db->getTokensByOwner($available_userid);
+
 if (!isset($data['requestUser'])) {
 	$req_user = false;
 } else {
 	$req_user = $data['requestUser'];
 }
-$db->creToken($cli_token, $available_userid);
+$db->creToken("temp", $available_userid, $username);
 $tokens = $db->getTokensByOwner($available_userid);
 $profile = $db->getProfileByOwner($available_userid);
 $authdata = array(
 	"accessToken" => $tokens[0],
-	"clientToken" => $tokens[1],
 	"username" => $profile->name,
 	"status" => "OK"
 );

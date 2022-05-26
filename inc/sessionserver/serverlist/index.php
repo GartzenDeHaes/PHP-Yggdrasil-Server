@@ -7,7 +7,7 @@ if (cmethod::isPost() == false) {
 	exit;
 }
 $check_post_data = array(
-	"client_token", "region", "lang", "start", "limit"
+	"acc_token", "region", "lang", "start", "limit"
 );
 $data = json_decode(file_get_contents('php://input'), true, 10);
 if ($data == null) {
@@ -22,13 +22,13 @@ foreach ($check_post_data as $v) {
 		exit;
 	}
 }
-$client_token = safe_input($data['client_token']);
+$acc_token = safe_input($data['acc_token']);
 $region = safe_input($data['region']);
 $lang = safe_input($data['lang']);
 $limit = $data['limit'];
 $start = $data['start'];
 
-if ($client_token == '') {
+if ($acc_token == '') {
 	$db->updIp404($client_ip_int);
 	exceptions::doErr(403, 'ForbiddenOperationException', 'invalid request parameters', 13);
 	exit;

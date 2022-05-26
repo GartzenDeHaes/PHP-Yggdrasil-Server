@@ -66,27 +66,23 @@ if (! $db->createUser($username, $password, $email, $secphz, $client_ip)) {
 $userid = UUID::getUserUuid(md5($username));
 $db->updateUser($username, $userid);
 $available_userid = $db->getUserid($username);
-if (!isset($data['clientToken'])) {
-	$cli_token = UUID::getUserUuid(md5(md5(uniqid()) . $available_userid));
-} else {
-	$cli_token = $data['clientToken'];
-}
+
 if (!isset($data['requestUser'])) {
 	$req_user = false;
 } else {
 	$req_user = $data['requestUser'];
 }
-$db->creToken($cli_token, $available_userid);
-$tokens = $db->getTokensByOwner($available_userid);
-$profile = $db->getProfileByOwner($available_userid);
+
+$db->creToken("temp", $available_userid, $username);			// creates acc_token and cli_token
+$tokens = $db->getTokensByOwner($available_userid);	// selects the tokens just created
+$profile = $db->getProfileByOwner($available_userid);	// creates a profile object from the record in users just created
 $authdata = array(
-	"accessToken" => $tokens[0],
-	"clientToken" => $tokens[1],
-	"username" => $profile->name,
+	"accessToken" => $tokens[0],		// acc_token
+	"username" => $profile->name,		// username
 	"status" => "OK"
 );
 if ($profile !== null) {
-	$db->profileToken($tokens[0], $profile->UUID);
+	$db->profileToken($tokens[0], $profile->UUID);	// updates tokens with profile=UUID (player_uuid from users)
 	$authdata["availableProfiles"] = array(
 		$profile->getArrayFormated()
 	);

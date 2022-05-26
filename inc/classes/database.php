@@ -11,11 +11,11 @@ class database
 		$this->mysqli->exec('PRAGMA synchronous=NORMAL;');
 
 		if (!$dbexists) {
-			$sql = "CREATE TABLE IF NOT EXISTS [chkname] (" . PHP_EOL .
-				"[uuid] varchar(32) PRIMARY KEY," . PHP_EOL .
-				"[playername] varchar(30) NOT NULL UNIQUE" . PHP_EOL .
-				");" . PHP_EOL;
-			$this->mysqli->exec($sql);
+			// $sql = "CREATE TABLE IF NOT EXISTS [chkname] (" . PHP_EOL .
+			// 	"[uuid] varchar(32) PRIMARY KEY," . PHP_EOL .
+			// 	"[playername] varchar(30) NOT NULL UNIQUE" . PHP_EOL .
+			// 	");" . PHP_EOL;
+			// $this->mysqli->exec($sql);
 
 			// uid			NOT USED
 			// username		Entered by user on registration page
@@ -29,8 +29,6 @@ class database
 				"[username] NVARCHAR(32) NOT NULL UNIQUE," . PHP_EOL .
 				"[password] NVARCHAR(32) NOT NULL," . PHP_EOL .
 				"[email] NVARCHAR(32) UNIQUE," . PHP_EOL .
-				"[myid] VARCHAR(32) NOT NULL DEFAULT ''," . PHP_EOL .
-				"[myidkey] VARCHAR(16) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[regip] VARCHAR(40) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[regdate] INTEGER(10) NOT NULL DEFAULT 0," . PHP_EOL .
 				"[lastloginip] INTEGER NOT NULL DEFAULT 0," . PHP_EOL .
@@ -39,15 +37,16 @@ class database
 				"[secques] NVARCHAR(32) NOT NULL DEFAULT ''," . PHP_EOL .
 				"[vtime] INTEGER(11) NOT NULL DEFAULT 0," . PHP_EOL .
 				"[userid] VARCHAR(32) UNIQUE," . PHP_EOL .
-				"[uuid] VARCHAR(32) DEFAULT NULL" . PHP_EOL .
+				"[uuid] VARCHAR(32) DEFAULT NULL," . PHP_EOL .
+				"[acc_token] VARCHAR(32) NOT NULL" . PHP_EOL .
 				")" . PHP_EOL;
 			$this->mysqli->exec($sql);
 			$this->mysqli->exec("CREATE INDEX users_email_idx ON users (email);");
 
 			$sql = "CREATE TABLE IF NOT EXISTS [sessions] (" . PHP_EOL .
-				"[server_id] VARCHAR(128) NOT NULL," . PHP_EOL .
+				"[server_id] VARCHAR(80) NOT NULL," . PHP_EOL .
 				"[acc_token] VARCHAR(32) NOT NULL," . PHP_EOL .
-				"[ipaddr] VARCHAR(40) DEFAULT NULL," . PHP_EOL .
+				"[cli_token] VARCHAR(32) NOT NULL," . PHP_EOL .
 				"[o_time] TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " . PHP_EOL .
 				"PRIMARY KEY([server_id], [acc_token]) )" . PHP_EOL;
 			$this->mysqli->exec($sql);
@@ -58,7 +57,7 @@ class database
 				"[profile] VARCHAR(50) DEFAULT NULL," . PHP_EOL .
 				"[ptime] TIMESTAMP DEFAULT CURRENT_TIMESTAMP," . PHP_EOL .
 				"[state] INT(1) NOT NULL DEFAULT 1," . PHP_EOL .
-				"[owner_uuid] VARCHAR(32) NOT NULL )" . PHP_EOL;
+				"[owner_uuid] VARCHAR(32) NOT NULL UNIQUE )" . PHP_EOL;
 			$this->mysqli->exec($sql);
 
 			$sql = "CREATE TABLE IF NOT EXISTS [servers] (" . PHP_EOL .
@@ -200,28 +199,22 @@ class database
 	}
 	function createUser($username, $password, $email, $secqu, $userip, $saltChar6 = "salty") {
 		$encrypted = md5(md5($password) . $saltChar6);
-
-		return $this->query("insert into [users] ([userid], [username], [password], [email], [secques], [regip], [salt]) VALUES ('" . $username . "', '" . $username . "', '" . $encrypted . "', '" . $email . "', '" . $secqu . "', '" . $userip . "', '" . $saltChar6 . "');");
+		$uuid = UUID::getUserUuid($username);
+		$acc_token = UUID::getUserUuid(md5(md5(uniqid()) . $email));
+		return $this->query("insert into [users] ([userid], [username], [password], [email], [secques], [regip], [salt], uuid, acc_token) VALUES ('" . $username . "', '" . $username . "', '" . $encrypted . "', '" . $email . "', '" . $secqu . "', '" . $userip . "', '" . $saltChar6 . "', '".$uuid."', '".$acc_token."');");
 	}
 	function chkPasswd($username, $passwd)	{
 		$ret = $this->query("select * from users where username = '" . $username . "'");
 		if ($rec = $ret->fetchArray()) {
 			$ucpass = $rec["password"];
 			$salt = $rec["salt"];
-			$playername = $rec["userid"];
-			$playeruuid = UUID::getUserUuid($playername);
-			$skinuuid = ""; // file_get_contents("https://api.zhjlfx.cn/?type=getuuid&method=email&email=".$email);
+			//$playername = $rec["userid"];
+			//$playeruuid = UUID::getUserUuid($playername);
 
 			$encrypted = md5(md5($passwd) . $salt);
 			$rs = ($encrypted == $ucpass);
 			if ($rs) {
-				if ($skinuuid == '') {
-					$this->crePlayerUuid($playeruuid, $username, $playername);
-					return $rs;
-				} else {
-					$this->crePlayerUuid($skinuuid, $username, $playername);
-					return $rs;
-				}
+				return true;
 			}
 		}
 		return false;
@@ -236,8 +229,10 @@ class database
 		}
 		return false;
 	}
-	function creToken($cli_token, $userid)	{
-		$acctoken = UUID::getUserUuid(uniqid() . $cli_token);
+	function creToken($cli_token, $userid, $username)	{
+		$ret = $this->query("select acc_token from users where username = '" . $username . "'");
+		$acctoken = $ret->fetchArray()[0];
+
 		$ret = $this->query("select * from tokens where owner_uuid = '" . $userid . "';");
 		if ($rec = $ret->fetchArray()) {
 			$this->query_change("update tokens set acc_token = '" . $acctoken . "', cli_token = '" . $cli_token . "', state = 1 where owner_uuid = '" . $userid . "';");
@@ -252,19 +247,26 @@ class database
 		}
 		return false;
 	}
-	function crePlayerUuid($playeruuid, $username, $playername) {
-		$ret = $this->query("select * from users where username = '" . $username . "';");
+	function getCliTokenByAcctoken($acc_token) {
+		$ret = $this->query("SELECT cli_token FROM tokens WHERE acc_token = '" . $acc_token . "';");
 		if ($rec = $ret->fetchArray()) {
-			$uuid = $rec["uuid"];
-			if ($uuid == "") {
-				$this->query_change("update users set uuid = '" . $playeruuid . "' where username = '" . $username . "';");
-				$this->addPlayerInfo($playername, $playeruuid);
-				return;
-			}
+			return $rec['cli_token'];
 		}
-		$playeruuid = $uuid;
-		$this->addPlayerInfo($playername, $playeruuid);
+		return false;
 	}
+	// function crePlayerUuid($playeruuid, $username, $playername) {
+	// 	$ret = $this->query("select * from users where username = '" . $username . "';");
+	// 	if ($rec = $ret->fetchArray()) {
+	// 		$uuid = $rec["uuid"];
+	// 		if ($uuid == "") {
+	// 			$this->query_change("update users set uuid = '" . $playeruuid . "' where username = '" . $username . "';");
+	// 			//$this->addPlayerInfo($playername, $playeruuid);
+	// 			return;
+	// 		}
+	// 	}
+	// 	$playeruuid = $uuid;
+	// 	//$this->addPlayerInfo($playername, $playeruuid);
+	// }
 	function getProfileByOwner($userid) {
 		$ret = $this->query("select * from users where userid = '" . $userid . "'");
 		if ($rec = $ret->fetchArray()) {
@@ -274,6 +276,9 @@ class database
 	}
 	function profileToken($acctoken, $player_uuid) {
 		$this->query_change("update tokens set profile = '" . $player_uuid . "' where acc_token = '" . $acctoken . "';");
+	}
+	function updTokenCli($acctoken, $cli_token) {
+		$this->query_change("update tokens set cli_token = '" . $cli_token . "' where acc_token = '" . $acctoken . "';");
 	}
 	function getUseridByAcctoken($acctoken) {
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
@@ -299,7 +304,7 @@ class database
 	function getTokenState($acctoken) {
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
 		if ($rec = $ret->fetchArray()) {
-			return $rec[4];
+			return true;// $rec[4];
 		}
 		return false;
 	}
@@ -321,32 +326,42 @@ class database
 		}
 		return false;
 	}
-	function creSession($server_id, $acc_token, $ip) {
-		$this->query_change("insert into sessions (server_id, acc_token, ipaddr, o_time) values ('" . $server_id . "','" . $acc_token . "','" . $ip . "', CURRENT_TIMESTAMP);");
-	}
-	function chkSession($playername, $serverid, $ipaddr) {
-		$ret = $this->query("select * from sessions where server_id = '" . $serverid . "'");
+	function creSession($server_id, $acc_token) {
+		$ret = $this->query("SELECT * FROM sessions WHERE server_id='".$server_id."' AND acc_token = '". $acc_token."';");
 		if ($rec = $ret->fetchArray()) {
-			$owner_accctoken = $rec['acc_token'];
-			$owner_userid = $this->getUseridByAcctoken($owner_accctoken);
-			if ($owner_userid) {
-				if ($profl = $this->getProfileByOwner($owner_userid)) {
-					$player = $profl->name;
-				} else {
-					$player = "not found";
-				}
-				return (($player == $playername) && ($ipaddr == 'NONE' || $ipaddr == $rec[2]));
-			}
+			$this->query_change("UPDATE sessions SET o_time=CURRENT_TIMESTAMP WHERE server_id='".$server_id."' AND acc_token = '". $acc_token."';");
+			return $rec['cli_token'];
+		} else {
+			$cli_token = UUID::getUserUuid(md5(uniqid()));
+			$this->query_change("insert into sessions (server_id, acc_token, cli_token, o_time) values ('" . $server_id . "','" . $acc_token . "','" . $cli_token . "', CURRENT_TIMESTAMP);");
+			return $cli_token;
+		}
+	}
+	function chkSession($username, $serverid) {
+		$acc_token = "";
+		$ret = $this->query("select acc_token from users where username = '" . $username . "';");
+		if ($rec = $ret->fetchArray()) {
+			$acc_token = $rec[0];
+		} else {
+			return false;
+		}
+
+		$ret = $this->query("select * from sessions where server_id = '" . $serverid . "' AND acc_token='".$acc_token."';");
+		if ($rec = $ret->fetchArray()) {
+			return $rec['cli_token'];
 		}
 		return false;
 	}
-	function getAcctokenByServerid($serverid) {
-		$ret = $this->query("select * from sessions where server_id = '" . $serverid . "';");
-		if ($rec = $ret->fetchArray()) {
-			return $rec['acc_token'];
-		}
-		return false;
+	function updateAllSessionState() {
+		$this->query_change("delete from sessions where o_time <= DATETIME('now', '-120 minutes');");
 	}
+	// function getAcctokenByServerid($serverid, $user_uuid) {
+	//  	$ret = $this->query("select * from sessions where server_id = '" . $serverid . "';");
+	//  	if ($rec = $ret->fetchArray()) {
+	//  		return $rec['acc_token'];
+	//  	}
+	//  	return false;
+	// }
 	function getProfileByUuid($playeruuid) {
 		$ret = $this->query("select * from users where uuid = '" . $playeruuid . "';");
 		if ($rec = $ret->fetchArray()) {
@@ -362,24 +377,20 @@ class database
 		}
 		return false;
 	}
-	function updateAllSessionState()
-	{
-		$this->query_change("delete from sessions where o_time <= DATETIME('now', '-120 minutes');");
-	}
-	function updateSkinData($uuid)
-	{
+	//function updateSkinData($uuid)
+	//{
 		//$texturedata = "texturedata for".$uuid; // = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
 		//$this->query_change("update users set texturedata = '" . $texturedata . "' where uuid = '" . $uuid . "';");
-	}
-	function addPlayerInfo($playername, $playeruuid)
-	{
-		$ret = $this->query("select * from chkname where uuid = '" . $playeruuid . "'");
-		if ($rec = $ret->fetchArray()) {
-			$this->query_change("update chkname set playername = '" . $playername . "' where uuid = '" . $playeruuid . "';");
-		} else {
-			$this->query_change("insert into chkname (uuid, playername) values ('" . $playeruuid . "', '" . $playername . "');");
-		}
-	}
+	//}
+	// function addPlayerInfo($playername, $playeruuid)
+	// {
+	// 	$ret = $this->query("select * from chkname where uuid = '" . $playeruuid . "'");
+	// 	if ($rec = $ret->fetchArray()) {
+	// 		$this->query_change("update chkname set playername = '" . $playername . "' where uuid = '" . $playeruuid . "';");
+	// 	} else {
+	// 		$this->query_change("insert into chkname (uuid, playername) values ('" . $playeruuid . "', '" . $playername . "');");
+	// 	}
+	// }
 	function getPlayerUuidByAcctoken($acctoken)
 	{
 		$ret = $this->query("select * from tokens where acc_token = '" . $acctoken . "';");
@@ -388,16 +399,16 @@ class database
 		}
 		return false;
 	}
-	function isPlayerNameChanged($uuid)
-	{
-		$getname = $this->query("select * from users where uuid = '" . $uuid . "';");
-		if ($recname = $getname->fetchArray(SQLITE3_NUM)) {
-			$getsavedname = $this->query("select * from chkname where uuid = '" . $uuid . "';");
-			if ($recsave = $getsavedname->fetchArray(SQLITE3_NUM)) {
-				$rs = ($recname[1] !== $recsave[1]);
-				return $rs;
-			}
-		}
-		return false;
-	}
+	// function isPlayerNameChanged($uuid)
+	// {
+	// 	$getname = $this->query("select * from users where uuid = '" . $uuid . "';");
+	// 	if ($recname = $getname->fetchArray(SQLITE3_NUM)) {
+	// 		$getsavedname = $this->query("select * from chkname where uuid = '" . $uuid . "';");
+	// 		if ($recsave = $getsavedname->fetchArray(SQLITE3_NUM)) {
+	// 			$rs = ($recname[1] !== $recsave[1]);
+	// 			return $rs;
+	// 		}
+	// 	}
+	// 	return false;
+	// }
 }

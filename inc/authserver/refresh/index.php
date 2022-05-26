@@ -22,11 +22,6 @@ foreach ($check_post_data as $v) {
 $acctoken = safe_input($data['accessToken']);
 $clitoken = $data['clientToken'];
 $available_userid = $db->getUseridByAcctoken($acctoken);
-if (!isset($clitoken)) {
-    $cli_token = UUID::getUserUuid(md5(md5(uniqid()).$available_userid));
-} else {
-    $cli_token = $data['clientToken'];
-}
 if (!isset($data['requestUser'])) {
     $req_user = false;
 } else {
@@ -42,7 +37,7 @@ if ($db->getTokenState($acctoken) < 0) {
     exceptions::doErr(403,'ForbiddenOperationException','The Token has expired', 18);
 }
 $db->setTokenState($acctoken);
-$db->creToken($cli_token,$available_userid);
+//$db->creToken($cli_token,$available_userid,);
 //$tokens = $db->getTokensByOwner($cli_token,$available_userid);
 $tokens = $db->getTokensByOwner($available_userid);
 $profile = $db->getProfileByOwner($available_userid);
