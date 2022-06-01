@@ -61,14 +61,13 @@ if (! is_numeric($int_cur_users)) {
 	exit;
 }
 
-if ($db->updServerHeartbeat($server_id, $server_token, $host, $str_name, $int_port, $int_prot_ver, $char_is_public, $int_max_users, $int_cur_users)) {
-	$db->updIpAuthFail($client_ip_int);
-	exceptions::doErr(404, 'ForbiddenOperationException', 'Unauthorized');
-	exit;
-}
 $respdata = array(
 	"status" => "OK",
 	"server_id" => $server_id
 );
+
+if (! $db->updServerHeartbeat($server_id, $server_token, $host, $str_name, $int_port, $int_prot_ver, $char_is_public, $int_max_users, $int_cur_users)) {
+	$respdata["status"] = "unknown server";
+}
 
 echo json_encode($respdata);
