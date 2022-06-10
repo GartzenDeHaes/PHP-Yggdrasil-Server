@@ -8,7 +8,7 @@ if (cmethod::isGet() == false) {
 $uri = explode('/',$_SERVER["REQUEST_URI"]);
 $uuid = safe_input($uri[count($uri)-1]);
 $unsigned = (isset($_GET["unsigned"])) ? ($_GET["unsigned"]=="true"):true;
-$db->updateSkinData($uuid);
+//$db->updateSkinData($uuid);
 $profile = $db->getProfileByUuid($uuid);
 if($profile == false){
 	exceptions::doErr(204,'ForbiddenOperationException','Session not found', 41);
