@@ -8,7 +8,21 @@ Ported from [here](https://github.com/Erythrocyte3803/PHP-Yggdrasil-Server).
 - Unless you do some URL rewriting in the webserver, the endpoints are authserver/authentication, /sessionserver/session, etc.
 - Manual registration page at /registration
 
-TODO
+API (TODO)
 
-- Testing.  Only /authenticate and registration have been tested with the SQLITE backend.
-- Registraion API.
+- /authserver/authenticate
+- /authserver/invalidate
+- /authserver/motd
+- /authserver/refresh
+- /authserver/registration
+- /authserver/registration_test (test web page)
+- /authserver/signout (TODO)
+- /authserver/validate
+
+-  /sessionserver/hasJoined
+-  /sessionserver/join
+-  /sessionserver/profile
+-  /sessionserver/serverlist
+-  /sessionserver/serveronline
+-  /sessionserver/session (TODO)
+-  /servicelist.php
